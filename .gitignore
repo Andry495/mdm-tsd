@@ -1,0 +1,12 @@
+**/bin/
+**/obj/
+**/.gradle/
+**/build/
+local.properties
+.vs/
+.idea/
+.env
+*.pfx
+*.jks
+*.keystore
+*.apk

@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Агент ТСД</string>
+    <string name="accessibility_description">Нужна, чтобы портал мог нажимать кнопки на экране терминала по записанному сценарию.</string>
+    <style name="Theme.TsdAgent" parent="Theme.AppCompat.Light.NoActionBar" />
+</resources>

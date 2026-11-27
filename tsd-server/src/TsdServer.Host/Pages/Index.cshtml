@@ -1,0 +1,56 @@
+@page
+@model TsdServer.Host.Pages.IndexModel
+@{
+  ViewData["Title"] = "Магазин";
+}
+<h1>Магазин</h1>
+<p class="muted">Первый раз агент ставится отсюда вручную, как из RuStore. Дальше обновления и остальные пакеты он забирает сам.</p>
+
+@if (Model.Agent is null)
+{
+  <div class="card"><p>APK агента ещё не положен в каталог.</p></div>
+}
+else
+{
+  var agent = Model.Agent;
+  <article class="card store-hero">
+    <div class="icon">А</div>
+    <div>
+      <h2 style="margin: 0 0 4px;">@agent.Title</h2>
+      <div class="muted">@agent.PackageName · версия @agent.VersionName (@agent.VersionCode)</div>
+      <p>@agent.Summary</p>
+    </div>
+    <div class="actions row">
+      <a class="button" href="/store/versions/@agent.VersionId/file" download="ru.bytplast.tsdagent.apk">Скачать</a>
+      <p class="muted">Файл около 13 МБ, страница при этом не уходит. Загрузка видна в шторке уведомлений: откройте скачанный apk.</p>
+    </div>
+  </article>
+  <div class="card">
+    <h2>Как поставить на телефон или ТСД</h2>
+    <ol class="steps">
+      <li>Откройте эту страницу в браузере устройства: <code>@Model.BaseUrl</code></li>
+        <li>Скачайте APK и откройте его. Разрешите установку из этого браузера.</li>
+        <li>Нажмите «Сообщить порталу». Агент сам поставит сертификаты площадки и дальше обновляется без магазина.</li>
+    </ol>
+    <p class="row">
+      <a class="button secondary" href="/store/portal.crt">Сертификат</a>
+      <a class="button secondary" href="/store/bootstrap.json">Файл настройки</a>
+    </p>
+    <p class="muted">Отпечаток сертификата: <code>@Model.Fingerprint</code></p>
+    <p class="muted">Площадка: @Model.SiteName</p>
+  </div>
+}
+
+@if (Model.Others.Count > 0)
+{
+  <h2>Другие пакеты</h2>
+  @foreach (var item in Model.Others)
+  {
+    <article class="card">
+      <h3 style="margin-top: 0;">@item.Title</h3>
+      <div class="muted">@item.PackageName · @item.VersionName (@item.VersionCode)</div>
+      <p>@item.Summary</p>
+      <a class="button secondary" href="/store/versions/@item.VersionId/file" download>Скачать</a>
+    </article>
+  }
+}

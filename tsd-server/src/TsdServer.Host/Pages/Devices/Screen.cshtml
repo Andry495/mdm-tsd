@@ -1,0 +1,118 @@
+@page "/devices/{id}/screen"
+@model TsdServer.Host.Pages.Devices.ScreenModel
+@{
+  ViewData["Title"] = "Экран";
+}
+<p><a href="/devices/@Model.DeviceId">К устройству</a></p>
+<h1>Экран</h1>
+<p class="muted" id="note">Подключение просит показать весь экран. Агент может быть в фоне: в портал идёт то, что сейчас на телефоне.</p>
+<p class="row">
+  <button type="button" id="connect">Подключить</button>
+  <button type="button" class="secondary" id="stop">Отключить</button>
+  <button type="button" class="secondary" id="back">Назад</button>
+  <button type="button" class="secondary" id="home">Домой</button>
+  <button type="button" class="secondary" id="recents">Недавние</button>
+</p>
+<p class="row">
+  <input id="typed" placeholder="Текст на терминал" style="max-width: 280px" />
+  <button type="button" class="secondary" id="send-text">Ввести</button>
+</p>
+<p class="error" id="live-error" hidden></p>
+<div class="card" style="padding: 8px;">
+  <div style="width: min(420px, 100%);">
+    <div id="pad" style="position: relative; touch-action: none; user-select: none;">
+      <img id="screen" alt="Экран терминала" draggable="false" style="display: block; width: 100%; height: auto; background: #111; min-height: 240px; pointer-events: none; user-select: none; -webkit-user-drag: none;" />
+    </div>
+    <div style="display: flex; background: #111; border-radius: 0 0 8px 8px;">
+      <button type="button" id="key-back" title="Назад" style="flex: 1; background: transparent; color: #ddd; font-size: 22px; padding: 8px 0;">◁</button>
+      <button type="button" id="key-home" title="Домой" style="flex: 1; background: transparent; color: #ddd; font-size: 22px; padding: 8px 0;">○</button>
+      <button type="button" id="key-recents" title="Недавние" style="flex: 1; background: transparent; color: #ddd; font-size: 22px; padding: 8px 0;">▢</button>
+    </div>
+  </div>
+</div>
+<script>
+(() => {
+  const id = @Json.Serialize(Model.DeviceId);
+  const pad = document.getElementById("pad");
+  const img = document.getElementById("screen");
+  const note = document.getElementById("note");
+  const error = document.getElementById("live-error");
+  const connect = document.getElementById("connect");
+  const stop = document.getElementById("stop");
+  function paint(connected) {
+    connect.classList.toggle("secondary", connected);
+    stop.classList.toggle("secondary", !connected);
+  }
+  let previous = null;
+  let down = null;
+  async function post(url, body) {
+    const response = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: body ? JSON.stringify(body) : "{}" });
+    if (!response.ok) throw new Error("портал не принял команду");
+  }
+  function command(url, body) {
+    post(url, body).catch((ex) => {
+      error.hidden = false;
+      error.textContent = ex.message || "команда не ушла";
+    });
+  }
+  connect.onclick = () => command(`/devices/${id}/live/start`);
+  stop.onclick = () => command(`/devices/${id}/live/stop`);
+  const press = (code) => () => command(`/devices/${id}/live/input`, { type: "key", code });
+  document.getElementById("back").onclick = press("back");
+  document.getElementById("home").onclick = press("home");
+  document.getElementById("recents").onclick = press("recents");
+  document.getElementById("key-back").onclick = press("back");
+  document.getElementById("key-home").onclick = press("home");
+  document.getElementById("key-recents").onclick = press("recents");
+  document.getElementById("send-text").onclick = () => {
+    const value = document.getElementById("typed").value;
+    if (value) command(`/devices/${id}/live/input`, { type: "text", value });
+  };
+  function point(event) {
+    const rect = pad.getBoundingClientRect();
+    const x = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
+    const y = Math.min(1, Math.max(0, (event.clientY - rect.top) / rect.height));
+    return { x, y };
+  }
+  pad.addEventListener("dragstart", (event) => event.preventDefault());
+  pad.addEventListener("pointerdown", (event) => {
+    if (event.button !== 0) return;
+    event.preventDefault();
+    down = point(event);
+    pad.setPointerCapture(event.pointerId);
+  });
+  function finish(event) {
+    if (!down) return;
+    const start = down;
+    down = null;
+    const end = point(event);
+    const moved = Math.abs(end.x - start.x) + Math.abs(end.y - start.y);
+    if (moved < 0.02) command(`/devices/${id}/live/input`, { type: "tap", x: end.x, y: end.y });
+    else command(`/devices/${id}/live/input`, { type: "swipe", x: start.x, y: start.y, x2: end.x, y2: end.y });
+  }
+  pad.addEventListener("pointerup", finish);
+  pad.addEventListener("pointercancel", () => { down = null; });
+  async function tick() {
+    try {
+      const status = await fetch(`/devices/${id}/live/status`);
+      if (status.ok) {
+        const body = await status.json();
+        note.textContent = body.connected ? "Сессия открыта." : "Нажмите «Подключить».";
+        paint(!!body.connected);
+        if (body.error) { error.hidden = false; error.textContent = body.error; }
+        else error.hidden = true;
+      }
+      const frame = await fetch(`/devices/${id}/live/frame`, { cache: "no-store" });
+      if (frame.status === 200) {
+        const blob = await frame.blob();
+        const url = URL.createObjectURL(blob);
+        img.src = url;
+        if (previous) URL.revokeObjectURL(previous);
+        previous = url;
+      }
+    } catch (_) {}
+    setTimeout(tick, 250);
+  }
+  tick();
+})();
+</script>

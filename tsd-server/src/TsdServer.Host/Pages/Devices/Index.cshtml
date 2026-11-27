@@ -1,0 +1,51 @@
+@page
+@model TsdServer.Host.Pages.Devices.IndexModel
+@{
+  ViewData["Title"] = "Устройства";
+}
+<h1>Устройства</h1>
+<p class="muted">Агент сам пишет порталу, что он включён, даже из другой подсети. Сканирование нужно только для тех, кто ещё не сообщил о себе. Пока устройство не подтвердили, пакеты ему не ставятся.</p>
+@if (User.IsInRole("admin"))
+{
+  <form method="post" asp-page-handler="Scan" class="row">
+    <button type="submit" disabled="@(Model.Scanning ? "disabled" : null)">@(Model.Scanning ? "Сканирование…" : "Сканировать сеть")</button>
+    @if (Model.FinishedAt is not null)
+    {
+      <span class="muted">последний проход @Model.FinishedAt</span>
+    }
+  </form>
+  @if (!string.IsNullOrEmpty(Model.ScanError))
+  {
+    <p class="error">@Model.ScanError</p>
+  }
+}
+<table>
+  <thead>
+    <tr><th>Устройство</th><th>Адрес</th><th>Состояние</th><th>Агент</th><th>Связь</th>@if (User.IsInRole("admin")) { <th></th> }</tr>
+  </thead>
+  <tbody>
+  @foreach (var device in Model.Devices)
+  {
+    <tr>
+      <td><a href="/devices/@device.Id">@device.Title()</a><div class="muted">@device.Manufacturer @(device.Title() == device.Model ? device.Serial : device.Model)</div></td>
+      <td>@device.LastAddress</td>
+      <td>@device.State</td>
+      <td>@(device.AgentName ?? "—")</td>
+      <td class="@(Clock.Online(device) ? "ok" : "muted")">@(Clock.Online(device) ? "на связи" : Clock.When(device.LastSeenAt))</td>
+      @if (User.IsInRole("admin"))
+      {
+        <td>
+          <form method="post" asp-page-handler="Delete" onsubmit="return confirm('Удалить устройство из портала?');">
+            <input type="hidden" name="id" value="@device.Id" />
+            <button class="warn" type="submit" style="padding: 6px 10px;">Удалить</button>
+          </form>
+        </td>
+      }
+    </tr>
+  }
+  </tbody>
+</table>
+@if (Model.Devices.Count == 0)
+{
+  <p class="muted">Пока ни один агент не ответил.</p>
+}

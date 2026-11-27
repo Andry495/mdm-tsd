@@ -1,0 +1,71 @@
+@page
+@model TsdServer.Host.Pages.Catalog.IndexModel
+@{
+  ViewData["Title"] = "Каталог";
+}
+<h1>Каталог</h1>
+<p class="muted">Сюда кладутся только APK. Файлы 1С портал не раздаёт.</p>
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+  <p class="ok">@Model.Message</p>
+}
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+  <p class="error">@Model.Error</p>
+}
+
+<div class="card">
+  <h2>Загрузить APK</h2>
+  <form method="post" asp-page-handler="Upload" enctype="multipart/form-data">
+    <label>Название в магазине</label>
+    <input name="title" placeholder="Например, платформа 1С" />
+    <label>Файл APK</label>
+    <input type="file" name="apk" accept=".apk,application/vnd.android.package-archive" required />
+    <p><button type="submit">Положить в каталог</button></p>
+  </form>
+</div>
+
+<div class="card">
+  <h2>Группа</h2>
+  <form method="post" asp-page-handler="Group" class="row">
+    <input name="name" placeholder="Название" required />
+    <select name="family">
+      @foreach (var family in Families.All)
+      {
+        <option value="@family">@Families.Title(family)</option>
+      }
+    </select>
+    <button type="submit">Создать</button>
+  </form>
+  <form method="post" asp-page-handler="Assign" class="row" style="margin-top: 12px;">
+    <select name="groupId" required>
+      <option value="">Группа</option>
+      @foreach (var group in Model.Groups)
+      {
+        <option value="@group.Id">@group.Name · @Families.Title(group.Family)</option>
+      }
+    </select>
+    <select name="versionId" required>
+      <option value="">Версия пакета</option>
+      @foreach (var version in Model.Versions)
+      {
+        <option value="@version.Id">@version.Label</option>
+      }
+    </select>
+    <button type="submit">Назначить</button>
+  </form>
+</div>
+
+<table>
+  <thead><tr><th>Пакет</th><th>Версия</th><th>Назначения</th></tr></thead>
+  <tbody>
+  @foreach (var row in Model.Rows)
+  {
+    <tr>
+      <td>@row.Title<div class="muted">@row.PackageName</div></td>
+      <td>@row.VersionName (@row.VersionCode)</td>
+      <td>@row.Groups</td>
+    </tr>
+  }
+  </tbody>
+</table>

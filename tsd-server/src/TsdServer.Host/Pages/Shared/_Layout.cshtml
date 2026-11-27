@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>@ViewData["Title"] — портал ТСД</title>
+  <link rel="stylesheet" href="/site.css" />
+</head>
+<body>
+  <header>
+    <strong><a href="/">Портал ТСД</a></strong>
+    <nav>
+      <a href="/">Магазин</a>
+      @if (User.Identity?.IsAuthenticated == true)
+      {
+        <a href="/devices">Устройства</a>
+        @if (User.IsInRole("admin"))
+        {
+          <a href="/catalog">Каталог</a>
+        }
+      }
+    </nav>
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+      <form method="post" action="/logout">
+        <button class="secondary" type="submit">Выйти</button>
+      </form>
+    }
+    else
+    {
+      <a href="/login">Войти</a>
+    }
+  </header>
+  <main>
+    @RenderBody()
+  </main>
+</body>
+</html>

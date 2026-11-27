@@ -1,0 +1,88 @@
+@page "/devices/{id}"
+@model TsdServer.Host.Pages.Devices.DetailModel
+@{
+  ViewData["Title"] = Model.Device.Title();
+  var device = Model.Device;
+}
+<p><a href="/devices">Все устройства</a></p>
+<h1>@device.Title()</h1>
+<div class="card">
+  <p>Имя: @(string.IsNullOrWhiteSpace(device.Name) ? "не задано" : device.Name)</p>
+  <p>Модель: @device.Model</p>
+  <p>Производитель: @device.Manufacturer</p>
+  <p>Серийный номер: @device.Serial</p>
+  <p>Android: @device.Android</p>
+  <p>Адрес: @device.LastAddress</p>
+  <p>Состояние: @device.State</p>
+  <p>Тип: @(device.Family is null ? "не выбран" : Families.Title(device.Family))</p>
+  <p>Агент: @(device.AgentName ?? "—") (@device.AgentCode)</p>
+  <p>Обновление: @(device.UpdatePhase ?? "нет данных")</p>
+  <p>Экран: @(device.ScreenPhase ?? "нет данных")</p>
+  <p class="@(Clock.Online(device) ? "ok" : "muted")">@(Clock.Online(device) ? "На связи" : "Нет связи") · @Clock.When(device.LastSeenAt)</p>
+  @if (!string.IsNullOrEmpty(device.LastError))
+  {
+    <p class="bad">@device.LastError</p>
+  }
+  <p class="muted">@device.Id</p>
+  @if (device.State == "managed")
+  {
+    <p><a class="button" href="/devices/@device.Id/screen">Экран</a></p>
+  }
+</div>
+<div class="card">
+  <h2>Канал агента</h2>
+  @if (Model.Logs.Count == 0)
+  {
+    <p class="muted">Агент ещё не прислал журнал. Строки появляются, когда телефон выходит на связь.</p>
+  }
+  else
+  {
+    <ul>
+      @foreach (var line in Model.Logs)
+      {
+        <li>@Clock.When(line.At) · @line.Area · @line.Text</li>
+      }
+    </ul>
+  }
+</div>
+
+@if (User.IsInRole("admin") && device.State != "managed")
+{
+  <div class="card">
+    <h2>Подтверждение</h2>
+    <form method="post" asp-page-handler="Confirm">
+      <label>Тип устройства</label>
+      <select name="family">
+        @foreach (var family in Families.All)
+        {
+          if (family == Model.Suggested)
+          {
+            <option value="@family" selected>@Families.Title(family)</option>
+          }
+          else
+          {
+            <option value="@family">@Families.Title(family)</option>
+          }
+        }
+      </select>
+      <label>Группа</label>
+      <select name="groupId">
+        <option value="">Без группы</option>
+        @foreach (var group in Model.Groups)
+        {
+          <option value="@group.Id">@group.Name · @Families.Title(group.Family)</option>
+        }
+      </select>
+      <p class="row">
+        <button type="submit">Подтвердить</button>
+      </p>
+    </form>
+    <form method="post" asp-page-handler="Reject">
+      <button class="warn" type="submit">Отклонить</button>
+    </form>
+    @if (!string.IsNullOrEmpty(Model.Error))
+    {
+      <p class="error">@Model.Error</p>
+    }
+  </div>
+}

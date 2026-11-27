@@ -1,0 +1,77 @@
+:root {
+  --ink: #1c1915;
+  --muted: #5e584f;
+  --line: #e4ddd2;
+  --paper: #f6f3ee;
+  --card: #fff;
+  --green: #1f6b45;
+  --green-dark: #174f33;
+  --warn: #8a5a12;
+  --bad: #8d2d2d;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font: 16px/1.45 "Segoe UI", sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+}
+a { color: var(--green-dark); }
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 28px;
+  background: #243126;
+  color: #f4f1ea;
+}
+header a { color: inherit; text-decoration: none; }
+nav { display: flex; gap: 18px; }
+header form { margin: 0; }
+button, .button {
+  border: 0;
+  border-radius: 8px;
+  padding: 10px 16px;
+  background: var(--green);
+  color: white;
+  font: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+}
+button.secondary, .button.secondary { background: #ece7df; color: var(--ink); }
+button.warn { background: var(--bad); }
+main { max-width: 980px; margin: 0 auto; padding: 28px 20px 64px; }
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 22px;
+  margin-bottom: 16px;
+}
+.store-hero { display: grid; grid-template-columns: 72px 1fr auto; gap: 18px; align-items: center; }
+.icon {
+  width: 72px; height: 72px; border-radius: 16px;
+  background: #1f6b45; color: white; display: grid; place-items: center;
+  font-weight: 700; font-size: 28px;
+}
+.muted { color: var(--muted); }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+table { width: 100%; border-collapse: collapse; background: white; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+label { display: block; margin: 12px 0 4px; }
+input, select {
+  width: 100%; max-width: 420px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font: inherit;
+}
+.ok { color: var(--green-dark); }
+.bad { color: var(--bad); }
+.warn { color: var(--warn); }
+.error { background: #f8e8e8; color: var(--bad); padding: 10px 12px; border-radius: 8px; }
+.steps { padding-left: 18px; }
+.steps li { margin: 6px 0; }
+code { background: #efeae2; padding: 1px 5px; border-radius: 4px; }
+@media (max-width: 700px) {
+  .store-hero { grid-template-columns: 72px 1fr; }
+  .store-hero .actions { grid-column: 1 / -1; }
+}

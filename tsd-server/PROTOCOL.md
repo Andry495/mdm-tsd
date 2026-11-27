@@ -70,13 +70,13 @@
   "ok": true,
   "state": "managed",
   "certSha256": "<hex отпечатка сертификата портала>",
-  "certificates": "https://192.168.10.205/store/portal.crt",
+  "certificates": "https://mdm-tsd/store/portal.crt",
   "update": {
     "jobId": "...",
     "packageName": "ru.bytplast.tsdagent",
     "versionCode": 13,
     "sha256": "<hex>",
-    "url": "https://192.168.10.205/api/agent/files/versions/{versionId}"
+    "url": "https://mdm-tsd/api/agent/files/versions/{versionId}"
   },
   "session": {"sessionId": "...", "fps": 4, "width": 720}
 }

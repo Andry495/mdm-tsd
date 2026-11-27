@@ -2,7 +2,7 @@
 
 import os
 
-SOURCE_DIR = r"\\bytplast.local\public\_Проекты\Честный_знак\02_Исходные_материалы\Печать_этикеток"
+SOURCE_DIR = r"\\fileserver\public\_Проекты\Честный_знак\02_Исходные_материалы\Печать_этикеток"
 
 print("Проверка каталога:")
 print(f"Существует: {os.path.exists(SOURCE_DIR)}")

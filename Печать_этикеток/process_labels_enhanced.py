@@ -34,11 +34,11 @@ if os.name == 'nt':
 
 # Настройка путей
 CATALOGS = [
-    r"\\bytplast.local\public\_Дизайнеры\ЯЯЯПроцессы\Design_Work\Маркировочные",
-    r"\\bytplast.local\public\_Маркировочные_этикетки"
+    r"\\fileserver\public\_Дизайнеры\ЯЯЯПроцессы\Design_Work\Маркировочные",
+    r"\\fileserver\public\_Маркировочные_этикетки"
 ]
 
-SOURCE_DIR = r"\\bytplast.local\public\_Проекты\Честный_знак\02_Исходные_материалы\Печать_этикеток"
+SOURCE_DIR = r"\\fileserver\public\_Проекты\Честный_знак\02_Исходные_материалы\Печать_этикеток"
 
 # Находим папки с брендами и пиктограммами
 BRANDS_DIR = None

@@ -29,7 +29,7 @@ object CertInstaller {
             markInstalled(config)
             return null
         }
-        val file = File(context.cacheDir, "bytplast-ca.crt")
+        val file = File(context.cacheDir, "mdm-tsd-ca.crt")
         file.writeText(pem(root))
         val uri = FileProvider.getUriForFile(context, "${context.packageName}.files", file)
         return Intent(Intent.ACTION_VIEW).apply {

@@ -1,6 +1,10 @@
 $ErrorActionPreference = 'Stop'
-$server = 'root@192.168.10.205'
-$caConfig = 'MSDC1.BYTPLAST.LOCAL\BYTPLAST-MSDC1-CA-1'
+$server = 'root@mdm-tsd'
+$caConfig = $env:TSD_CA_CONFIG
+$caChain = $env:TSD_CA_CHAIN
+if ([string]::IsNullOrWhiteSpace($caConfig) -or [string]::IsNullOrWhiteSpace($caChain)) {
+    throw 'Задайте TSD_CA_CONFIG и TSD_CA_CHAIN'
+}
 $template = 'WebServer'
 $remote = '/opt/tsd-portal'
 $work = Join-Path $env:TEMP 'tsd-portal-cert'
@@ -34,7 +38,7 @@ $leaf = Join-Path $work 'portal.cer'
 if ($LASTEXITCODE -ne 0) { throw "certificate request was not issued, exit $LASTEXITCODE" }
 
 $chain = Join-Path $work 'chain.p7b'
-& curl.exe -fsS -k --negotiate -u : -o $chain "https://msdc1.bytplast.local/certsrv/certnew.p7b?ReqID=CACert&Renewal=-1&Enc=b64"
+& curl.exe -fsS -k --negotiate -u : -o $chain $caChain
 if ($LASTEXITCODE -ne 0) { throw 'could not download the CA chain' }
 
 & scp -o BatchMode=yes $leaf $chain "${server}:/tmp/"

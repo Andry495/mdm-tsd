@@ -16,7 +16,7 @@ public sealed class PortalOptions
     public int CommandPort { get; set; } = Protocol.CommandPort;
     public int ReconcileIntervalSeconds { get; set; } = 60;
     public string PublicBaseUrl { get; set; } = "";
-    public string SiteName { get; set; } = "Бытпласт";
+    public string SiteName { get; set; } = "mdm-tsd";
     public string CertPath { get; set; } = "/certs/portal.crt";
     public string CertKeyPath { get; set; } = "/certs/portal.key";
     public string AdminLogin { get; set; } = "admin";

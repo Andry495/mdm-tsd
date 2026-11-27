@@ -44,9 +44,9 @@ class BootstrapActivity : AppCompatActivity() {
         val fingerprint = findViewById<EditText>(R.id.fingerprint)
         val site = findViewById<EditText>(R.id.site)
         val status = findViewById<TextView>(R.id.status)
-        server.setText(config.server.ifEmpty { "https://192.168.10.205" })
+        server.setText(config.server.ifEmpty { "https://mdm-tsd" })
         fingerprint.setText(config.fingerprint)
-        site.setText(config.site.ifEmpty { "Бытпласт" })
+        site.setText(config.site.ifEmpty { "mdm-tsd" })
         if (config.ready)
             status.text = "Агент запущен. Он сам сообщает порталу, что включён."
         findViewById<Button>(R.id.pick).setOnClickListener {
@@ -108,7 +108,7 @@ class BootstrapActivity : AppCompatActivity() {
                 if (AgentConfig.normalize(fingerprint).length != 64) {
                     val json = PortalRegistrar.fetchBootstrap(typedServer)
                     fingerprint = json.getString("fingerprint")
-                    if (site.isEmpty()) site = json.optString("site", "Бытпласт")
+                    if (site.isEmpty()) site = json.optString("site", "mdm-tsd")
                     runOnUiThread {
                         fingerprintField.setText(fingerprint)
                         siteField.setText(site)
@@ -116,7 +116,7 @@ class BootstrapActivity : AppCompatActivity() {
                 }
                 config.server = typedServer
                 config.fingerprint = fingerprint
-                config.site = site.ifEmpty { "Бытпласт" }
+                config.site = site.ifEmpty { "mdm-tsd" }
                 Identity.ensure(config)
                 val message = PortalRegistrar(this, config).announce()
                 startForegroundService(Intent(this, AgentService::class.java))

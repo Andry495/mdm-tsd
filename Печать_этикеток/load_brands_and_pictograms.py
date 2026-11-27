@@ -3,7 +3,7 @@
 import os
 from pathlib import Path
 
-SOURCE_DIR = r"\\bytplast.local\public\_Проекты\Честный_знак\02_Исходные_материалы\Печать_этикеток"
+SOURCE_DIR = r"\\fileserver\public\_Проекты\Честный_знак\02_Исходные_материалы\Печать_этикеток"
 BRANDS_DIR = os.path.join(SOURCE_DIR, "Бренды")
 PICTOGRAMS_DIR = os.path.join(SOURCE_DIR, "Пиктограммы")
 

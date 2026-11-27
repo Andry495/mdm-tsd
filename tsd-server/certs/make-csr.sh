@@ -7,9 +7,9 @@ distinguished_name = dn
 req_extensions = v3
 prompt = no
 [dn]
-CN = mdm-tsd.bytplast.local
+CN = mdm-tsd
 [v3]
-subjectAltName = DNS:mdm-tsd.bytplast.local,DNS:mdm-tsd,IP:192.168.10.205
+subjectAltName = DNS:mdm-tsd
 extendedKeyUsage = serverAuth,clientAuth
 keyUsage = digitalSignature,keyEncipherment
 EOF

@@ -3,7 +3,7 @@
 import os
 from pathlib import Path
 
-SOURCE_DIR = r"\\bytplast.local\public\_Проекты\Честный_знак\02_Исходные_материалы\Печать_этикеток"
+SOURCE_DIR = r"\\fileserver\public\_Проекты\Честный_знак\02_Исходные_материалы\Печать_этикеток"
 
 print("=" * 80)
 print("ИЗУЧЕНИЕ КАТАЛОГА С ИСХОДНЫМИ МАТЕРИАЛАМИ")

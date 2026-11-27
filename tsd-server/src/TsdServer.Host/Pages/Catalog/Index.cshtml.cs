@@ -82,6 +82,7 @@ public sealed class IndexModel : PageModel
                 Detail = info.PackageName + " " + info.VersionName
             });
             await _db.SaveChangesAsync();
+            await CatalogHistory.TrimAsync(_db, _options.DataDir);
             Message = "Пакет добавлен: " + package.Title + " " + info.VersionName;
         }
         catch (Exception ex)
@@ -163,21 +164,28 @@ public sealed class IndexModel : PageModel
         var packages = await _db.Packages.ToListAsync();
         var versions = await _db.Versions.OrderByDescending(x => x.VersionCode).ToListAsync();
         var assignments = await _db.Assignments.ToListAsync();
-        Versions = versions.Select(version =>
-        {
-            var package = packages.FirstOrDefault(x => x.Id == version.PackageId);
-            return new VersionChoice(version.Id, (package?.Title ?? version.PackageId) + " " + version.VersionName);
-        }).ToList();
-        Rows = versions.Select(version =>
+        var current = packages
+            .Select(package => versions.Where(x => x.PackageId == package.Id).OrderByDescending(x => x.VersionCode).FirstOrDefault())
+            .Where(x => x is not null)
+            .Cast<PackageVersion>()
+            .OrderBy(x => packages.First(p => p.Id == x.PackageId).Title)
+            .ToList();
+        Versions = current.Select(version =>
         {
             var package = packages.First(x => x.Id == version.PackageId);
-            var names = assignments.Where(x => x.VersionId == version.Id)
+            return new VersionChoice(version.Id, package.Title + " " + version.VersionName);
+        }).ToList();
+        Rows = current.Select(version =>
+        {
+            var package = packages.First(x => x.Id == version.PackageId);
+            var names = assignments.Where(x => x.PackageId == package.Id)
                 .Select(x => Groups.FirstOrDefault(g => g.Id == x.GroupId)?.Name)
-                .Where(x => x is not null);
-            return new CatalogRow(package.Title, package.PackageName, version.VersionName, version.VersionCode, string.Join(", ", names));
+                .Where(x => x is not null)
+                .Distinct();
+            return new CatalogRow(package.Id, package.Title, package.PackageName, version.VersionName, version.VersionCode, string.Join(", ", names));
         }).ToList();
     }
 }
 
 public sealed record VersionChoice(string Id, string Label);
-public sealed record CatalogRow(string Title, string PackageName, string VersionName, int VersionCode, string Groups);
+public sealed record CatalogRow(string PackageId, string Title, string PackageName, string VersionName, int VersionCode, string Groups);

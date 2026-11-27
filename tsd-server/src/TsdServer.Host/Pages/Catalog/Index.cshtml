@@ -62,7 +62,7 @@
   @foreach (var row in Model.Rows)
   {
     <tr>
-      <td>@row.Title<div class="muted">@row.PackageName</div></td>
+      <td><a href="/catalog/@row.PackageId">@row.Title</a><div class="muted">@row.PackageName</div></td>
       <td>@row.VersionName (@row.VersionCode)</td>
       <td>@row.Groups</td>
     </tr>

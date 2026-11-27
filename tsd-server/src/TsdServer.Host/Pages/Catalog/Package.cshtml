@@ -1,0 +1,53 @@
+@page "/catalog/{id}"
+@model TsdServer.Host.Pages.Catalog.PackageModel
+@{
+  ViewData["Title"] = Model.Package.Title;
+}
+<p><a href="/catalog">Каталог</a></p>
+<h1>@Model.Package.Title</h1>
+<p class="muted">@Model.Package.PackageName</p>
+
+<div class="card">
+  <h2>Актуальная версия</h2>
+  @if (Model.Current is null)
+  {
+    <p class="muted">Версий ещё нет.</p>
+  }
+  else
+  {
+    <p>@Model.Current.VersionName (@Model.Current.VersionCode)</p>
+    @if (!string.IsNullOrEmpty(Model.Current.Groups))
+    {
+      <p class="muted">Назначена: @Model.Current.Groups</p>
+    }
+    <p><a class="button secondary" href="/store/versions/@Model.Current.Id/file" download>Скачать</a></p>
+  }
+</div>
+
+<div class="card">
+  <h2>Прошлые версии</h2>
+  @if (Model.History.Count == 0)
+  {
+    <p class="muted">Прошлых версий нет.</p>
+  }
+  else
+  {
+    @if (Model.HistoryTrimmed)
+    {
+      <p class="muted">Показаны @PackageModel.HistoryLimit последних.</p>
+    }
+    <table>
+      <thead><tr><th>Версия</th><th>Назначения</th><th></th></tr></thead>
+      <tbody>
+      @foreach (var version in Model.History)
+      {
+        <tr>
+          <td>@version.VersionName (@version.VersionCode)</td>
+          <td>@(string.IsNullOrEmpty(version.Groups) ? "—" : version.Groups)</td>
+          <td><a href="/store/versions/@version.Id/file" download>Скачать</a></td>
+        </tr>
+      }
+      </tbody>
+    </table>
+  }
+</div>

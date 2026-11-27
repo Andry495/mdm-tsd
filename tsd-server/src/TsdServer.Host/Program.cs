@@ -467,6 +467,7 @@ public static class PortalSeed
             await db.SaveChangesAsync();
         }
         await ImportSeedAsync(db, options);
+        await CatalogHistory.TrimAsync(db, options.DataDir);
     }
 
     public static async Task ImportSeedAsync(PortalDb db, PortalOptions options)
